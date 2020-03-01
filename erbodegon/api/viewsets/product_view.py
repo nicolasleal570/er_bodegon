@@ -41,9 +41,8 @@ class ProductView(APIView):
 
     # HTTP DELETE
     def delete(self, request, pk):
+        # Get object with this pk
         product = get_object_or_404(Product.objects.all(), pk=pk)
         product.delete()
-        return Response({
-            "success": "Product '{}' deleted successfully".format(product.name),
-            "product": product
-        },status=204)
+        return Response({"sucess": "Product with id `{}` has been deleted.".format(pk)})
+

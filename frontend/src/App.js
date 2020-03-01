@@ -1,20 +1,19 @@
 import React from 'react'
-// import Navbar from './components/partials/Navbar/Navbar'
+import Navbar from './components/partials/Navbar'
 import ProductForm from './components/ProductForm';
+import ProductDashboard from './components/ProductDashboard';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom'
-
-function Home(){					
-  return <h1> Hola mundo </h1>
-}
 
 function App() {
   return (
     <Router>
-      {/* <Navbar /> */}
-      <ProductForm />
+      <Navbar />
 
       <Switch>
-        <Route exact path="/" component={Home} />
+        {/* <Route path="/dashboard" component={Dashboard} /> */}
+        <Route path="/products" component={ProductDashboard} />
+        <Route path="/new/product" component={ProductForm} />
+        <Route path="/update/product/:productId" component={ProductForm} />
       </Switch>
     </Router>
   );
