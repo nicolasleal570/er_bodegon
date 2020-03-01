@@ -29,9 +29,14 @@ export class ProductDashboard extends Component {
         }).catch(err => console.log(err));
     }
 
-    deleteProduct(index) {
-        Axios.delete(`http://localhost:8000/api/products/${index}`).then(res => {
-            this.getProductsFromAPI();
+    deleteProduct(product) {
+        const newProduct = {
+            ...product,
+            'is_available': false
+        }
+
+        Axios.put(`http://localhost:8000/api/products/${product.id}`, { 'product': newProduct }).then(res => {
+            this.getProductsFromAPI();            
         }).catch(err => console.log(err));
     }
 
@@ -51,8 +56,9 @@ export class ProductDashboard extends Component {
                                             <th scope="col">#</th>
                                             <th scope="col">Nombre</th>
                                             <th scope="col">Codigo</th>
-                                            <th scope="col">Costo</th>
+                                            <th scope="col">Precio real</th>
                                             <th scope="col">Descuento</th>
+                                            <th scope="col">Precio con Descuento</th>
                                             <th scope="col">Acciones</th>
                                         </tr>
                                     </thead>
@@ -62,10 +68,11 @@ export class ProductDashboard extends Component {
                                                 <th scope="row">{product.id}</th>
                                                 <td>{product.name}</td>
                                                 <td>{product.codigo}</td>
-                                                <td>{product.costo}</td>
+                                                <td>{product.costo} $</td>
                                                 <td>{product.descuento}%</td>
+                                                <td>{product.descuento !== 0 ? product.costo * (product.descuento / 100) : product.costo} $</td>
                                                 <td>
-                                                    <button onClick={() => this.deleteProduct(product.id)} className="btn btn-sm btn-danger mr-3">Eliminar</button>
+                                                    <button onClick={() => this.deleteProduct(product)} className="btn btn-sm btn-danger mr-3">Eliminar</button>
                                                     <Link to={`/update/product/${product.id}`} className="btn btn-sm btn-warning">Editar</Link>
                                                 </td>
                                             </tr> : ''
