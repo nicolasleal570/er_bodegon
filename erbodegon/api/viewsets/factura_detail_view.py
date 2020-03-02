@@ -10,7 +10,6 @@ from ..serializers.factura_detail_serializer import FacturaDetailSerializer
 class FacturaDetailView(APIView):
     # HTTP GET
     def get(self, request):
-        # facturas_detail = FacturaDetail.objects.raw('SELECT * FROM facturaDetail_facturaDetail WHERE id = "Articulo 3 de la api"')
         facturas_detail = FacturaDetail.objects.all()
         serializer = FacturaDetailSerializer(facturas_detail, many=True)
         return Response({"facturas_detail": serializer.data})

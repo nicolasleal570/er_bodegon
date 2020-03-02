@@ -10,7 +10,6 @@ from ..serializers.delivery_serializer import DeliverySerializer
 class DeliveryView(APIView):
     # HTTP GET
     def get(self, request):
-        # deliveries = Delivery.objects.raw('SELECT * FROM delivery_delivery WHERE id = "Articulo 3 de la api"')
         deliveries = Delivery.objects.all()
         serializer = DeliverySerializer(deliveries, many=True)
         return Response({"deliveries": serializer.data})

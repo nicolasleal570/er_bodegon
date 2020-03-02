@@ -8,6 +8,7 @@ class DeliverySerializer(serializers.Serializer):
     direction = serializers.CharField(max_length=200)
     discount = serializers.IntegerField()
     delivery_time = serializers.TimeField()
+    entregado_por = serializers.IntegerField()
     is_available = serializers.BooleanField()
 
     def create(self, validated_data):
@@ -17,6 +18,7 @@ class DeliverySerializer(serializers.Serializer):
         instance.direction = validated_data.get('direction', instance.direction)
         instance.discount = validated_data.get('discount', instance.discount)
         instance.delivery_time = validated_data.get('delivery_time', instance.delivery_time)
+        instance.entregado_por = validated_data.get('entregado_por', instance.entregado_por)
         instance.is_available = validated_data.get('is_available', instance.is_available)
 
         instance.save()

@@ -56,7 +56,7 @@ class FacturaDetail(models.Model):
 
 class Pago(models.Model):
     mount = models.FloatField()
-    divisa = models.OneToOneField("api.Divisa", on_delete=models.CASCADE)
+    divisa = models.ForeignKey("api.Divisa", on_delete=models.CASCADE)
     is_available = models.BooleanField(null=True, default=True)
 
 
@@ -77,6 +77,7 @@ class Delivery(models.Model):
     direction = models.CharField(max_length=200)
     discount = models.IntegerField()
     delivery_time = models.TimeField()
+    entregado_por = models.ForeignKey("api.Usuario", on_delete=models.CASCADE, null=True)
     is_available = models.BooleanField(null=True, default=True)
 
 

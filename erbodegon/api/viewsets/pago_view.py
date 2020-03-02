@@ -22,7 +22,7 @@ class PagoView(APIView):
         if serializer.is_valid(raise_exception=True):
             pago_saved = serializer.save()
         return Response({
-            "success": "Pago '{}' created successfully".format(pago_saved.name),
+            "success": "Pago '{}' created successfully".format(pago_saved.id),
             "pago": pago
         })
 
@@ -34,7 +34,7 @@ class PagoView(APIView):
         if serializer.is_valid(raise_exception=True):
             pago_saved = serializer.save()
         return Response({
-            "success": "Pago '{}' updated successfully".format(pago_saved.name),
+            "success": "Pago '{}' updated successfully".format(pago_saved.id),
             "pago": data
         })
 
