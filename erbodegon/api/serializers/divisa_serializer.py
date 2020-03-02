@@ -1,19 +1,17 @@
 from rest_framework import serializers
 
-from ..models import Product
+from ..models import Divisa
 
 # PRODUCT SERIALIZER
-class ProductSerializer(serializers.Serializer):
+class DivisaSerializer(serializers.Serializer):
     id = serializers.ReadOnlyField()
-    name = serializers.CharField(max_length=120)
-    codigo = serializers.FloatField()
-    costo = serializers.FloatField()
-    descuento = serializers.IntegerField()
-    category_id = serializers.IntegerField()
+    tasa = serializers.FloatField()
+    tipo = serializers.CharField(max_length=50)
     is_available = serializers.BooleanField()
 
+
     def create(self, validated_data):
-        return Product.objects.create(**validated_data)
+        return Divisa.objects.create(**validated_data)
 
     def update(self, instance, validated_data):
         instance.name = validated_data.get('name', instance.name)

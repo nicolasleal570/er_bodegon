@@ -21,7 +21,7 @@ export class ProductDashboard extends Component {
     getProductsFromAPI() {
         Axios.get('http://localhost:8000/api/products/').then(res => {
             this.setState({
-                ...this.state.products,
+                ...this.state,
                 products: res.data.products
             });
 
