@@ -24,7 +24,7 @@ class ClienteView(APIView):
             cliente_saved = serializer.save()
         return Response({
             "success": "Cliente '{}' created successfully".format(cliente_saved.id),
-            "cliente": cliente
+            "cliente": serializer.data
         })
 
     # HTTP PUT
@@ -36,7 +36,7 @@ class ClienteView(APIView):
             cliente_saved = serializer.save()
         return Response({
             "success": "Cliente '{}' updated successfully".format(cliente_saved.id),
-            "cliente": data
+            "cliente": serializer.data
         })
 
     # HTTP DELETE

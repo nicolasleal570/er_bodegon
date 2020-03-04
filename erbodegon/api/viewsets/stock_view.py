@@ -24,7 +24,7 @@ class StockView(APIView):
             stock_saved = serializer.save()
         return Response({
             "success": "Stock '{}' created successfully".format(stock_saved.id),
-            "stock": stock
+            "stock": serializer.data
         })
 
     # HTTP PUT
@@ -36,7 +36,7 @@ class StockView(APIView):
             stock_saved = serializer.save()
         return Response({
             "success": "Stock '{}' updated successfully".format(stock_saved.id),
-            "stock": data
+            "stock": serializer.data
         })
 
     # HTTP DELETE

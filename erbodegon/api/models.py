@@ -38,7 +38,7 @@ class Category(models.Model):
 class Factura(models.Model):
     total = models.IntegerField()
     codigo = models.IntegerField(unique=True)
-    pago = models.ForeignKey("api.Pago", on_delete=models.CASCADE)
+    # pago = models.ForeignKey("api.Pago", on_delete=models.CASCADE)
     delivery = models.ForeignKey("api.Delivery", on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     cliente = models.ForeignKey("api.Cliente", on_delete=models.CASCADE)
@@ -56,7 +56,9 @@ class FacturaDetail(models.Model):
 
 class Pago(models.Model):
     mount = models.FloatField()
-    divisa = models.ForeignKey("api.Divisa", on_delete=models.CASCADE)
+    divisa = models.OneToOneField("api.Divisa", on_delete=models.CASCADE)
+    factura = models.ForeignKey("api.Factura", on_delete=models.CASCADE, null=True)
+    instrumento = models.ForeignKey("api.Instrumento", on_delete=models.CASCADE, null=True)
     is_available = models.BooleanField(null=True, default=True)
 
 
@@ -87,18 +89,17 @@ class Usuario(models.Model):
     cedula = models.IntegerField(unique=True)
     birthday = models.DateField()
     ubication = models.CharField(max_length=200)
-    is_available = models.BooleanField(null=True, default=True)
+    is_available = models.BooleanField(default=True)
 
 
 class Empleado(models.Model):
     usuario = models.OneToOneField("api.Usuario", on_delete=models.CASCADE)
     cargo = models.CharField(max_length=150)
     sueldo = models.FloatField()
-    is_available = models.BooleanField(null=True, default=True)
+    is_available = models.BooleanField(default=True)
 
 
 class Cliente(models.Model):
     usuario = models.OneToOneField("api.Usuario", on_delete=models.CASCADE)
     tipo = models.CharField(max_length=150)
-    empleado = models.ForeignKey("api.Empleado", on_delete=models.CASCADE, null=True)
-    is_available = models.BooleanField(null=True, default=True)
+    is_available = models.BooleanField(default=True)

@@ -23,7 +23,7 @@ class FacturaView(APIView):
             factura_saved = serializer.save()
         return Response({
             "success": "Factura '{}' created successfully".format(factura_saved.codigo),
-            "factura": factura
+            "factura": serializer.data
         })
 
     # HTTP PUT
@@ -35,7 +35,7 @@ class FacturaView(APIView):
             factura_saved = serializer.save()
         return Response({
             "success": "Factura '{}' updated successfully".format(factura_saved.codigo),
-            "factura": data
+            "factura": serializer.data
         })
 
     # HTTP DELETE

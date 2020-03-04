@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import axios from 'axios';
 import { Redirect } from "react-router-dom";
+import SelectInputField from './partials/SelectInputField';
 
 import TextInputField from './partials/TextInputField';
 
@@ -31,6 +32,11 @@ export class ProductForm extends Component {
                     type: 'number',
                     value: ''
                 },
+                category_id: {
+                    placeholder: 'Selecciona una categoría',
+                    options: [],
+                    value: ''
+                },
             },
             handleErrors: {
                 exist: false,
@@ -41,56 +47,88 @@ export class ProductForm extends Component {
             },
             redirect: null,
             productId: null,
+            productLoading: true,
+            categoriesLoading: true,
         }
 
         this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
     }
 
-    componentDidMount(){
+    componentDidMount() {
         const { productId } = this.props.match.params
         if (productId !== undefined) {
-            axios.get(`http://localhost:8000/api/products/get/${productId}`).then(res => {
+            axios.get(`http://localhost:8000/api/productos/get/${productId}`).then(res => {
 
-            const formControls = {
-                name: {
-                    placeholder: 'Insert the name',
-                    type: 'text',
-                    value: res.data.product.name
-                },
-                codigo: {
-                    placeholder: 'Insert the codigo',
-                    type: 'number',
-                    value: res.data.product.codigo
-                },
-                costo: {
-                    placeholder: 'Insert the costo',
-                    type: 'number',
-                    value: res.data.product.costo
-                },
-                descuento: {
-                    placeholder: 'Insert the descuento',
-                    type: 'number',
-                    value: res.data.product.descuento
-                },
-            }
+                const formControls = {
+                    name: {
+                        placeholder: 'Insert the name',
+                        type: 'text',
+                        value: res.data.product.name
+                    },
+                    codigo: {
+                        placeholder: 'Insert the codigo',
+                        type: 'number',
+                        value: res.data.product.codigo
+                    },
+                    costo: {
+                        placeholder: 'Insert the costo',
+                        type: 'number',
+                        value: res.data.product.costo
+                    },
+                    descuento: {
+                        placeholder: 'Insert the descuento',
+                        type: 'number',
+                        value: res.data.product.descuento
+                    },
+                    category_id: {
+                        placeholder: 'Selecciona una categoría',
+                        value: res.data.product.category_id
+                    },
+                }
+
+                console.log(res.data.product);
+
+                this.setState({
+                    ...this.state,
+                    'productId': productId,
+                    'formControls': formControls
+                });
+
+            }).catch(err => console.log(err));
+        }
+
+        axios.get('http://localhost:8000/api/categorias/').then(res => {
+            let options = [];
+            res.data.categories.forEach(item => {
+                const opt = {...item, displayValue: item.name, value: item.id}
+                options.push(opt);
+            });
 
             this.setState({
                 ...this.state,
-                'productId': productId,
-                'formControls': formControls
-            });
-
-        }).catch(err => console.log(err));        
-        }
+                formControls: {
+                    ...this.state.formControls,
+                    category_id: {
+                        ...this.state.formControls.category_id,
+                        options: options
+                    }
+                }
+            }, () => this.setState({ ...this.state, categoriesLoading: false }))
+        });
     }
 
     // Handle change event in the inputs
     handleChange(event) {
         const name = event.target.name; // Input name
-        const value = event.target.value; // Input value
+        let value = event.target.value; // Input value
+
+        if (name === "category_id") {
+            value = Number(value);
+        }
 
         this.setState({
+            ...this.state,
             formControls: {
                 ...this.state.formControls,
                 [name]: {
@@ -98,7 +136,7 @@ export class ProductForm extends Component {
                     value
                 }
             }
-        });
+        }, ()=>console.log(this.state.formControls));
     }
 
     // Handle form submit
@@ -112,8 +150,11 @@ export class ProductForm extends Component {
             'codigo': form.codigo.value,
             'costo': form.costo.value,
             'descuento': form.descuento.value,
+            'category_id': Number(form.category_id.value),
             'is_available': true
         }
+
+        console.log(product);
 
         if (this.state.productId !== null) {
             this.updateProduct(product)
@@ -123,9 +164,9 @@ export class ProductForm extends Component {
 
     }
 
-    createNewProduct(product){
+    createNewProduct(product) {
         // Send the data to the api and create a new product
-        axios.post('http://localhost:8000/api/products/', { product }).then(res => {
+        axios.post('http://localhost:8000/api/productos/', { product }).then(res => {
             this.setState({ redirect: "/products" });
         }).catch(err => {
             const errors = {
@@ -141,9 +182,9 @@ export class ProductForm extends Component {
         });
     }
 
-    updateProduct(product){
+    updateProduct(product) {
         // Send the data to the api and create a new product
-        axios.put(`http://localhost:8000/api/products/${this.state.productId}`, { product }).then(res => {
+        axios.put(`http://localhost:8000/api/productos/${this.state.productId}`, { product }).then(res => {
             this.setState({ redirect: "/products" });
         }).catch(err => {
             const errors = {
@@ -189,10 +230,20 @@ export class ProductForm extends Component {
                                     placeholder={this.state.formControls.descuento.placeholder}
                                     value={this.state.formControls.descuento.value}
                                     onChange={this.handleChange} />
+
+                                <div className="form-group">
+                                    <SelectInputField name="category_id"
+                                        value={this.state.formControls.category_id.value}
+                                        onChange={this.handleChange}
+                                        placeholder={this.state.formControls.category_id.placeholder}
+                                        loading={this.state.categoriesLoading}
+                                        options={this.state.formControls.category_id.options} />
+                                </div>
+
                                 {
                                     this.state.handleErrors.exist ? <h1>Hay errores</h1> : ''
                                 }
-                                <input type="submit" value="Submit" className="btn btn-primary" />
+                                <input type="submit" value="Guardar Producto" className="btn btn-primary" />
                             </form>
                         </div>
                     </div>

@@ -23,7 +23,7 @@ class PagoView(APIView):
             pago_saved = serializer.save()
         return Response({
             "success": "Pago '{}' created successfully".format(pago_saved.id),
-            "pago": pago
+            "pago": serializer.data
         })
 
     # HTTP PUT
@@ -35,7 +35,7 @@ class PagoView(APIView):
             pago_saved = serializer.save()
         return Response({
             "success": "Pago '{}' updated successfully".format(pago_saved.id),
-            "pago": data
+            "pago": serializer.data
         })
 
     # HTTP DELETE

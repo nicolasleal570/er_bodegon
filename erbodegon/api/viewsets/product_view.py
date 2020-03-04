@@ -24,7 +24,7 @@ class ProductView(APIView):
             product_saved = serializer.save()
         return Response({
             "success": "Product '{}' created successfully".format(product_saved.name),
-            "product": product
+            "product": serializer.data
         })
 
     # HTTP PUT
@@ -36,7 +36,7 @@ class ProductView(APIView):
             product_saved = serializer.save()
         return Response({
             "success": "Product '{}' updated successfully".format(product_saved.name),
-            "product": data
+            "product": serializer.data
         })
 
     # HTTP DELETE

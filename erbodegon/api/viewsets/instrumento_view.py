@@ -24,7 +24,7 @@ class InstrumentoView(APIView):
             instrumento_saved = serializer.save()
         return Response({
             "success": "Instrumento '{}' created successfully".format(instrumento_saved.name),
-            "instrumento": instrumento
+            "instrumento": serializer.data
         })
 
     # HTTP PUT
@@ -36,7 +36,7 @@ class InstrumentoView(APIView):
             instrumento_saved = serializer.save()
         return Response({
             "success": "Instrumento '{}' updated successfully".format(instrumento_saved.name),
-            "instrumento": data
+            "instrumento": serializer.data
         })
 
     # HTTP DELETE

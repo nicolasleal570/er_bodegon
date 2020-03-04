@@ -23,7 +23,7 @@ class DeliveryView(APIView):
             delivery_saved = serializer.save()
         return Response({
             "success": "Delivery '{}' created successfully".format(delivery_saved.id),
-            "delivery": delivery
+            "delivery": serializer.data
         })
 
     # HTTP PUT
@@ -35,7 +35,7 @@ class DeliveryView(APIView):
             delivery_saved = serializer.save()
         return Response({
             "success": "Delivery '{}' updated successfully".format(delivery_saved.id),
-            "delivery": data
+            "delivery": serializer.data
         })
 
     # HTTP DELETE

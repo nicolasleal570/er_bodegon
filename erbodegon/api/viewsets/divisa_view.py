@@ -23,7 +23,7 @@ class DivisaView(APIView):
             divisa_saved = serializer.save()
         return Response({
             "success": "Divisa '{}' created successfully".format(divisa_saved.tipo),
-            "divisa": divisa
+            "divisa": serializer.data
         })
 
     # HTTP PUT
@@ -35,7 +35,7 @@ class DivisaView(APIView):
             divisa_saved = serializer.save()
         return Response({
             "success": "Divisa '{}' updated successfully".format(divisa_saved.tipo),
-            "divisa": data
+            "divisa": serializer.data
         })
 
     # HTTP DELETE

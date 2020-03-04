@@ -24,7 +24,7 @@ class UsuarioView(APIView):
             usuario_saved = serializer.save()
         return Response({
             "success": "Usuario '{}' created successfully".format(usuario_saved.name),
-            "usuario": usuario
+            "usuario": serializer.data
         })
 
     # HTTP PUT
@@ -36,7 +36,7 @@ class UsuarioView(APIView):
             usuario_saved = serializer.save()
         return Response({
             "success": "Usuario '{}' updated successfully".format(usuario_saved.name),
-            "usuario": data
+            "usuario": serializer.data
         })
 
     # HTTP DELETE

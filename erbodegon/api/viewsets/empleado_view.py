@@ -24,7 +24,7 @@ class EmpleadoView(APIView):
             empleado_saved = serializer.save()
         return Response({
             "success": "Empleado '{}' created successfully".format(empleado_saved.id),
-            "empleado": empleado
+            "empleado": serializer.data
         })
 
     # HTTP PUT
@@ -36,7 +36,7 @@ class EmpleadoView(APIView):
             empleado_saved = serializer.save()
         return Response({
             "success": "Empleado '{}' updated successfully".format(empleado_saved.id),
-            "empleado": data
+            "empleado": serializer.data
         })
 
     # HTTP DELETE

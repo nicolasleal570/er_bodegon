@@ -19,7 +19,7 @@ export class ProductDashboard extends Component {
     }
 
     getProductsFromAPI() {
-        Axios.get('http://localhost:8000/api/products/').then(res => {
+        Axios.get('http://localhost:8000/api/productos/').then(res => {
             this.setState({
                 ...this.state,
                 products: res.data.products
@@ -35,7 +35,7 @@ export class ProductDashboard extends Component {
             'is_available': false
         }
 
-        Axios.put(`http://localhost:8000/api/products/${product.id}`, { 'product': newProduct }).then(res => {
+        Axios.put(`http://localhost:8000/api/productos/${product.id}`, { 'product': newProduct }).then(res => {
             this.getProductsFromAPI();            
         }).catch(err => console.log(err));
     }
@@ -47,7 +47,7 @@ export class ProductDashboard extends Component {
                     <div className="col-md-12">
                         <h3>Todos los Producto</h3>
                         <hr />
-                        <Link to="/new/product" className="btn btn-primary mb-4">Crear Producto</Link>
+                        <Link to="/new/producto" className="btn btn-primary mb-4">Crear Producto</Link>
                         <div className="card">
                             <div className="card-body">
                                 <table className="table">
@@ -70,10 +70,10 @@ export class ProductDashboard extends Component {
                                                 <td>{product.codigo}</td>
                                                 <td>{product.costo} $</td>
                                                 <td>{product.descuento}%</td>
-                                                <td>{product.descuento !== 0 ? product.costo * (product.descuento / 100) : product.costo} $</td>
+                                                <td>{product.descuento !== 0 ? (product.costo * (product.descuento / 100)).toFixed(2) : product.costo} $</td>
                                                 <td>
                                                     <button onClick={() => this.deleteProduct(product)} className="btn btn-sm btn-danger mr-3">Eliminar</button>
-                                                    <Link to={`/update/product/${product.id}`} className="btn btn-sm btn-warning">Editar</Link>
+                                                    <Link to={`/update/producto/${product.id}`} className="btn btn-sm btn-warning">Editar</Link>
                                                 </td>
                                             </tr> : ''
                                         })}
