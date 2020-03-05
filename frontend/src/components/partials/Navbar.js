@@ -15,16 +15,40 @@ function Navbar() {
                         <li className="nav-item">
                             <Link className="nav-link" to="">Inicio</Link>
                         </li>
-                        <li className="nav-item">
-                            <Link className="nav-link" to="/new/venta">Nueva Venta</Link>
+                        <li className="nav-item dropdown">
+                            <Link className="nav-link dropdown-toggle" to="" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Ventas
+                            </Link>
+                            <div className="dropdown-menu" aria-labelledby="navbarDropdown">
+                                <Link className="dropdown-item" to="/ventas">Ver todos</Link>
+                                <Link className="dropdown-item" to="/new/venta">Crear Venta</Link>
+                            </div>
                         </li>
                         <li className="nav-item dropdown">
                             <Link className="nav-link dropdown-toggle" to="" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 Pagos
                             </Link>
                             <div className="dropdown-menu" aria-labelledby="navbarDropdown">
-                                <Link className="dropdown-item" to="/products">Ver todos</Link>
-                                <Link className="dropdown-item" to="/new/producto">Crear pago</Link>
+                                <Link className="dropdown-item" to="/pagos">Ver todos</Link>
+                                {/* <Link className="dropdown-item" to="/new/pago">Crear pago</Link> */}
+                            </div>
+                        </li>
+                        <li className="nav-item dropdown">
+                            <Link className="nav-link dropdown-toggle" to="" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Divisas
+                            </Link>
+                            <div className="dropdown-menu" aria-labelledby="navbarDropdown">
+                                <Link className="dropdown-item" to="/divisas">Ver todos</Link>
+                                <Link className="dropdown-item" to="/new/divisa">Crear divisa</Link>
+                            </div>
+                        </li>
+                        <li className="nav-item dropdown">
+                            <Link className="nav-link dropdown-toggle" to="" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Instrumentos
+                            </Link>
+                            <div className="dropdown-menu" aria-labelledby="navbarDropdown">
+                                <Link className="dropdown-item" to="/instrumentos">Ver todos</Link>
+                                <Link className="dropdown-item" to="/new/instrumento">Crear instrumento</Link>
                             </div>
                         </li>
                         <li className="nav-item dropdown">
@@ -32,8 +56,8 @@ function Navbar() {
                                 Delivery
                             </Link>
                             <div className="dropdown-menu" aria-labelledby="navbarDropdown">
-                                <Link className="dropdown-item" to="/products">Ver todos</Link>
-                                <Link className="dropdown-item" to="/new/producto">Crear delivery</Link>
+                                <Link className="dropdown-item" to="/delivery">Ver todos</Link>
+                                <Link className="dropdown-item" to="/new/delivery">Crear delivery</Link>
                             </div>
                         </li>
                         <li className="nav-item dropdown">
@@ -42,7 +66,7 @@ function Navbar() {
                             </Link>
                             <div className="dropdown-menu" aria-labelledby="navbarDropdown">
                                 <Link className="dropdown-item" to="/clientes">Ver todos</Link>
-                                <Link className="dropdown-item" to="/new/cliente">Crear cliente</Link>
+                                <Link className="dropdown-item" to="/new/usuario">Crear cliente</Link>
                             </div>
                         </li>
                         <li className="nav-item dropdown">

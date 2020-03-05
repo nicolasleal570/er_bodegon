@@ -2,13 +2,13 @@ import React, { Component } from 'react'
 import Axios from 'axios';
 import { Link } from 'react-router-dom'
 
-export class ProductDashboard extends Component {
+export class VentaDashboard extends Component {
 
     constructor(props) {
         super(props);
 
         this.state = {
-            products: []
+            facturas: []
         };
 
         this.deleteProduct = this.deleteProduct.bind(this);
@@ -19,10 +19,10 @@ export class ProductDashboard extends Component {
     }
 
     getProductsFromAPI() {
-        Axios.get('http://localhost:8000/api/productos/').then(res => {
+        Axios.get('http://localhost:8000/api/facturas/').then(res => {
             this.setState({
                 ...this.state,
-                products: res.data.products
+                facturas: res.data.facturas
             });
 
             console.log(this.state);
@@ -35,7 +35,7 @@ export class ProductDashboard extends Component {
             'is_available': false
         }
 
-        Axios.put(`http://localhost:8000/api/productos/${product.id}`, { 'product': newProduct }).then(res => {
+        Axios.put(`http://localhost:8000/api/facturas/${product.id}`, { 'factura': newProduct }).then(res => {
             this.getProductsFromAPI();            
         }).catch(err => console.log(err));
     }
@@ -45,35 +45,29 @@ export class ProductDashboard extends Component {
             <div className="container my-4">
                 <div className="row">
                     <div className="col-md-12">
-                        <h3>Todos los Producto</h3>
+                        <h3>Todas las Facturas</h3>
                         <hr />
-                        <Link to="/new/producto" className="btn btn-primary mb-4">Crear Producto</Link>
+                        <Link to="/new/venta" className="btn btn-primary mb-4">Crear Venta</Link>
                         <div className="card">
                             <div className="card-body">
                                 <table className="table">
                                     <thead>
                                         <tr>
                                             <th scope="col">#</th>
-                                            <th scope="col">Nombre</th>
                                             <th scope="col">Codigo</th>
-                                            <th scope="col">Precio real</th>
-                                            <th scope="col">Descuento</th>
-                                            <th scope="col">Precio con Descuento</th>
+                                            <th scope="col">Total</th>
                                             <th scope="col">Acciones</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {this.state.products.map(product => {
-                                            return product.is_available ? <tr key={product.id}>
-                                                <th scope="row">{product.id}</th>
-                                                <td>{product.name}</td>
-                                                <td>{product.codigo}</td>
-                                                <td>{product.costo} $</td>
-                                                <td>{product.descuento}%</td>
-                                                <td>{product.descuento !== 0 ? (product.costo * (product.descuento / 100)).toFixed(2) : product.costo} $</td>
+                                        {this.state.facturas.map(factura => {
+                                            return factura.is_available ? <tr key={factura.id}>
+                                                <th scope="row">{factura.id}</th>
+                                                <td>{factura.codigo}</td>
+                                                <td>{factura.total} $</td>
                                                 <td>
-                                                    <button onClick={() => this.deleteProduct(product)} className="btn btn-sm btn-danger mr-3">Eliminar</button>
-                                                    {/* <Link to={`/update/producto/${product.id}`} className="btn btn-sm btn-warning">Editar</Link> */}
+                                                    <button onClick={() => this.deleteProduct(factura)} className="btn btn-sm btn-danger mr-3">Eliminar</button>
+                                                    {/* <Link to={`/update/facturao/${factura.id}`} className="btn btn-sm btn-warning">Editar</Link> */}
                                                 </td>
                                             </tr> : ''
                                         })}
@@ -88,4 +82,4 @@ export class ProductDashboard extends Component {
     }
 }
 
-export default ProductDashboard
+export default VentaDashboard

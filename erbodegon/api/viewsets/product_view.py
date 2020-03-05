@@ -10,7 +10,7 @@ from ..serializers.product_serializer import ProductSerializer
 class ProductView(APIView):
     # HTTP GET
     def get(self, request):
-        # products = Product.objects.raw('SELECT * FROM product_product WHERE name = "Articulo 3 de la api"')
+        # products = Product.objects.raw('SELECT COUNT(category_id), name, id FROM api_product GROUP BY name')
         products = Product.objects.all()
         serializer = ProductSerializer(products, many=True)
         return Response({"products": serializer.data})

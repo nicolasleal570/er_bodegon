@@ -10,7 +10,7 @@ from ..serializers.instrumento_serializer import InstrumentoSerializer
 class InstrumentoView(APIView):
     # HTTP GET
     def get(self, request):
-        # instrumentos = Instrumento.objects.raw('SELECT * FROM instrumento_instrumento WHERE name = "Articulo 3 de la api"')
+        # instrumentos = Instrumento.objects.raw('SELECT * FROM instrumento_instrumento WHERE codigo = "Articulo 3 de la api"')
         instrumentos = Instrumento.objects.all()
         serializer = InstrumentoSerializer(instrumentos, many=True)
         return Response({"instrumentos": serializer.data})
@@ -23,7 +23,7 @@ class InstrumentoView(APIView):
         if serializer.is_valid(raise_exception=True):
             instrumento_saved = serializer.save()
         return Response({
-            "success": "Instrumento '{}' created successfully".format(instrumento_saved.name),
+            "success": "Instrumento '{}' created successfully".format(instrumento_saved.codigo),
             "instrumento": serializer.data
         })
 
@@ -35,7 +35,7 @@ class InstrumentoView(APIView):
         if serializer.is_valid(raise_exception=True):
             instrumento_saved = serializer.save()
         return Response({
-            "success": "Instrumento '{}' updated successfully".format(instrumento_saved.name),
+            "success": "Instrumento '{}' updated successfully".format(instrumento_saved.codigo),
             "instrumento": serializer.data
         })
 

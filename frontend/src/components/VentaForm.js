@@ -1,9 +1,11 @@
 import React, { Component } from 'react'
 import axios from 'axios'
-import SelectInputField from '../partials/SelectInputField';
+import SelectInputField from './partials/SelectInputField';
 import { Link } from 'react-router-dom';
-import DynamicProductsField from '../DynamicProductsField';
-import DynamicPagosField from '../DynamicPagosField';
+import DynamicProductsField from './DynamicProductsField';
+import DynamicPagosField from './DynamicPagosField';
+import TextInputField from './partials/TextInputField';
+import ErrorHandlerAler from './partials/ErrorHandlerAler'
 
 export class VentaForm extends Component {
 
@@ -17,11 +19,22 @@ export class VentaForm extends Component {
                     placeholder: 'Selecciona un cliente',
                     options: []
                 },
+                codigo: {
+                    placeholder: 'Codigo de la nueva factura',
+                    type: 'text',
+                    value: ''
+                },
                 productos: [{ productId: '', cantidad: '' }],
-                pago: {
-                    value: '',
-                    placeholder: 'Selecciona el pago realizado.',
-                    options: []
+                pago: [],
+                divisa_id: {
+                    placeholder: 'Selecciona la divisa',
+                    options: [],
+                    value: ''
+                },
+                instrumento_id: {
+                    placeholder: 'Selecciona la divisa',
+                    options: [],
+                    value: ''
                 },
                 delivery: {
                     value: '',
@@ -32,8 +45,16 @@ export class VentaForm extends Component {
                 },
                 total: 0,
             },
+            handleErrors: {
+                exist: false,
+                errors: {
+                    name: [],
+                    description: [],
+                }
+            },
             selectProductsOptions: [],
             selectPagosOptions: [],
+            facturaId: null,
             clientesLoading: true,
             productosLoading: true,
             pagosLoading: true,
@@ -116,7 +137,7 @@ export class VentaForm extends Component {
             }, () => this.setState({ ...this.state, pagosLoading: false }));
         });
 
-        axios.get('http://localhost:8000/api/delivery/').then(res => {
+        axios.get('http://localhost:8000/api/entregas/').then(res => {
 
             let options = [];
 
@@ -145,13 +166,56 @@ export class VentaForm extends Component {
                 });
             })
         });
+
+        this.getPagosSchema();
+    }
+
+    getPagosSchema() {
+        axios.get('http://localhost:8000/api/divisas/').then(res => {
+            let options = [];
+            res.data.divisas.forEach(item => {
+                const opt = { ...item, displayValue: `Tasa: ${item.tasa}`, value: item.id }
+                options.push(opt);
+            });
+
+            this.setState({
+                ...this.state,
+                formControls: {
+                    ...this.state.formControls,
+                    divisa_id: {
+                        ...this.state.formControls.divisa_id,
+                        options: options
+                    }
+                }
+            }, () => this.setState({ ...this.state, divisaLoading: false }))
+        });
+
+        axios.get('http://localhost:8000/api/instrumentos/').then(res => {
+            let options = [];
+            res.data.instrumentos.forEach(item => {
+                const opt = { ...item, displayValue: `Tipo: ${item.tipo} - Monto: ${item.mount}`, value: item.id }
+                options.push(opt);
+            });
+
+            this.setState({
+                ...this.state,
+                formControls: {
+                    ...this.state.formControls,
+                    instrumento_id: {
+                        ...this.state.formControls.instrumento_id,
+                        options: options
+                    }
+                }
+            }, () => this.setState({ ...this.state, instrumentoLoading: false }))
+
+        });
     }
 
     handleChange(event) {
         let name = event.target.name; // Input name
         let value = event.target.value; // Input value
 
-        if (name === "cliente" || name === "pago") {
+        if (name === "cliente" || name === "pago" || name === "codigo") {
             value = Number(value);
         }
 
@@ -164,11 +228,96 @@ export class VentaForm extends Component {
                     value
                 }
             }
-        }, () => console.log(this.state.formControls));
+        });
     }
 
     handleSubmit(event) {
+        const name = event.target.name;
+        let value = event.target.value;
         event.preventDefault();
+
+        console.log(this.state.formControls);
+
+        const codigo = this.state.formControls.codigo.value;
+        const clientId = this.state.formControls.cliente.value;
+        const productos = this.state.formControls.productos;
+        const pagos = this.state.formControls.pago;
+        const deliveryId = Number(this.state.formControls.delivery.value);
+        const total = this.state.formControls.total;
+
+        const factura = {
+            total,
+            codigo,
+            'delivery_id': deliveryId,
+            'cliente_id': clientId,
+            'is_available': true
+        }
+
+        axios.post('http://localhost:8000/api/facturas/', { factura }).then(res => {
+            const facturaId = res.data.factura.id;
+
+            pagos.forEach(pago => {
+                let newPago = {
+                    divisa_id: pago.divisaId,
+                    instrumento_id: pago.instrumentoId,
+                    mount: pago.mount,
+                    factura_id: facturaId,
+                    is_available: true
+                }
+                axios.post('http://localhost:8000/api/pagos/', { 'pago': newPago }).then(respon => {
+                    console.log(respon.data);
+                });
+            });
+
+            productos.forEach(producto => {
+                let price = 0;
+                this.state.selectProductsOptions.forEach(prod => {
+                    if (prod.id === producto.productId) {
+                        price = prod.costo;
+                        return;
+                    }
+                });
+
+                const newFactDetail = {
+                    price_per_unit: price,
+                    iva: 1.25,
+                    quantity: producto.cantidad,
+                    factura_id: facturaId,
+                    product_id: producto.productId,
+                    is_available: true
+                }
+
+                axios.post('http://localhost:8000/api/facturas/detalle/', { 'factura_detail': newFactDetail }).then(res => {
+                    console.log(res.data);
+                }).catch(err => {
+                    const errors = {
+                        exist: true,
+                        errors: err.response.data
+                    };
+                    this.setState({
+                        ...this.state,
+                        handleErrors: errors
+                    });
+        
+                    console.log(this.state.handleErrors);
+                });
+            });
+
+
+        }).catch(err => {
+            const errors = {
+                exist: true,
+                errors: err.response.data
+            };
+            this.setState({
+                ...this.state,
+                handleErrors: errors
+            });
+
+            console.log(this.state.handleErrors);
+        });
+
+
     }
 
     setSelectedProducts(inputFields) {
@@ -179,7 +328,7 @@ export class VentaForm extends Component {
                 productos: inputFields
             }
         }, () => {
-            let total = 0;
+            let total = this.state.formControls.total;
 
             this.state.selectProductsOptions.forEach(producto => {
                 this.state.formControls.productos.forEach(item => {
@@ -191,15 +340,13 @@ export class VentaForm extends Component {
                 });
             });
 
-            localStorage.setItem("totalVenta", total);
-
             this.setState({
                 ...this.state,
                 formControls: {
                     ...this.state.formControls,
                     total
                 }
-            }, () => console.log(this.state));
+            });
 
 
         });
@@ -212,32 +359,8 @@ export class VentaForm extends Component {
                 ...this.state.formControls,
                 pago: inputFields
             }
-        }, () => {
-            let total = 0;
-
-            this.state.selectProductsOptions.forEach(producto => {
-                console.log(producto);
-                this.state.formControls.pago.forEach(item => {
-                    if (producto.id === item.productId) {
-                        const descuento = producto.descuento !== 0 ? (producto.descuento / 100) : 1;
-                        const newPrice = producto.costo * item.cantidad * descuento;
-                        total += newPrice;
-                    }
-                });
-            });
-
-            localStorage.setItem("totalVenta", total);
-
-            this.setState({
-                ...this.state,
-                formControls: {
-                    ...this.state.formControls,
-                    total
-                }
-            }, () => console.log(this.state));
-
-
         });
+
     }
 
     render() {
@@ -245,6 +368,21 @@ export class VentaForm extends Component {
             <div className="container mt-4">
                 <form onSubmit={this.handleSubmit}>
                     <div className="row">
+                        <div className="col-md-12 mb-4">
+                            <div className="card">
+                                <div className="card-header">
+                                    <h2 className="card-title">Inserta el codigo para la nueva factura</h2>
+                                </div>
+                                <div className="card-body">
+                                    <TextInputField name="codigo"
+                                        placeholder={this.state.formControls.codigo.placeholder}
+                                        value={this.state.formControls.codigo.value}
+                                        onChange={this.handleChange} />
+                                </div>
+                            </div>
+                        </div>
+
+
                         {/* SELECCIONAR EL CLIENTE */}
                         <div className="col-md-12">
                             <div className="card">
@@ -298,7 +436,25 @@ export class VentaForm extends Component {
                     <div className="row my-4">
                         {/* PAGOS DEL USUARIO */}
                         <div className="col-md-12">
-                            <DynamicPagosField options={this.state.selectPagosOptions} setSelectedPagos={(inputFields) => this.setSelectedPagos(inputFields)} />
+                            <DynamicPagosField
+                                mount={this.state.formControls.total}
+                                options={this.state.selectPagosOptions}
+                                divisas={this.state.formControls.divisa_id}
+                                facturaId={this.state.facturaId}
+                                instrumentos={this.state.formControls.instrumento_id}
+                                setSelectedPagos={(inputFields) => this.setSelectedPagos(inputFields)} />
+                        </div>
+                    </div>
+                    <div className="row-mt-4">
+                        <div className="col-md-12">
+                            {
+                                this.state.handleErrors.exist ? <ErrorHandlerAler errors={this.state.handleErrors.errors} keys={['cliente_id', 'codigo', 'productos', 'pago', 'divisa_id', 'instrumento_id', 'delivery', 'total']} /> : ''
+                            }
+                        </div>
+                    </div>
+                    <div className="row mb-5">
+                        <div className="col-md-12">
+                            <input type="submit" value="Crear venta" className="btn btn-primary btn-block" />
                         </div>
                     </div>
                 </form>

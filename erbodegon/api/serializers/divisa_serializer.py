@@ -14,11 +14,8 @@ class DivisaSerializer(serializers.Serializer):
         return Divisa.objects.create(**validated_data)
 
     def update(self, instance, validated_data):
-        instance.name = validated_data.get('name', instance.name)
-        instance.codigo = validated_data.get('codigo', instance.codigo)
-        instance.costo = validated_data.get('costo', instance.costo)
-        instance.descuento = validated_data.get('descuento', instance.descuento)
-        instance.category_id = validated_data.get('category_id', instance.category_id)
+        instance.tipo = validated_data.get('tipo', instance.tipo)
+        instance.tasa = validated_data.get('tasa', instance.tasa)
         instance.is_available = validated_data.get('is_available', instance.is_available)
 
         instance.save()

@@ -1,12 +1,20 @@
 import React from 'react';
 import Navbar from './components/partials/Navbar';
 import ProductForm from './components/ProductForm';
-import UserForm from './components/UserForm';
+import ClientForm from './components/ClientForm';
 import ProductDashboard from './components/ProductDashboard';
 import ClientDashboard from './components/ClientDashboard';
-import VentaForm from './components/venta_form/VentaForm';
+import DeliveryForm from './components/DeliveryForm';
+import DeliveryDashboard from './components/DeliveryDashboard';
+import VentaForm from './components/VentaForm';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
-
+import PagoForm from './components/PagoForm';
+import PagoDashboard from './components/PagoDashboard';
+import VentaDashboard from './components/VentaDashboard';
+import DivisaForm from './components/DivisaForm';
+import InstrumentoForm from './components/InstrumentoForm';
+import DivisaDashboard from './components/DivisaDashboard';
+import InstrumentoDashboard from './components/InstrumentoDashboard';
 function App() {
   return (
     <Router>
@@ -16,10 +24,20 @@ function App() {
         {/* <Route path="/dashboard" component={Dashboard} /> */}
         <Route path="/productos" component={ProductDashboard} />
         <Route path="/clientes" component={ClientDashboard} />
+        <Route path="/delivery" component={DeliveryDashboard} />
+        <Route path="/pagos" component={PagoDashboard} />
+        <Route path="/ventas" component={VentaDashboard} />
+        <Route path="/divisas" component={DivisaDashboard} />
+        <Route path="/instrumentos" component={InstrumentoDashboard} />
         {/* <Route path="" component={DynamicField} /> */}
         <Route path="/new/producto" component={ProductForm} />
         <Route path="/update/producto/:productId" component={ProductForm} />
-        <Route path="/new/usuario" component={UserForm} />
+        <Route path="/new/usuario" component={ClientForm} />
+        <Route path="/update/cliente/:clientId" component={ClientForm} />
+        <Route path="/new/delivery" component={DeliveryForm} />
+        <Route path="/new/pago" component={PagoForm} />
+        <Route path="/new/divisa" component={DivisaForm} />
+        <Route path="/new/instrumento" component={InstrumentoForm} />
         <Route path="/new/venta" component={VentaForm} />
       </Switch>
     </Router>

@@ -6,8 +6,8 @@ from ..models import Stock
 class StockSerializer(serializers.Serializer):
     id = serializers.ReadOnlyField()
     cantidad = serializers.IntegerField()
-    fecha_creacion = serializers.DateTimeField()
-    fecha_vencimiento = serializers.DateTimeField()
+    fecha_creacion = serializers.ReadOnlyField()
+    fecha_vencimiento = serializers.ReadOnlyField()
     product_id = serializers.IntegerField()
     is_available = serializers.BooleanField()
 

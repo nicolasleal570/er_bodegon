@@ -10,6 +10,7 @@ from ..serializers.category_serializer import CategorySerializer
 class CategoryView(APIView):
     # HTTP GET
     def get(self, request):
+        # categories = Category.objects.raw('SELECT COUNT(CustomerID), Country FROM Customers GROUP BY Country')
         categories = Category.objects.all()
         serializer = CategorySerializer(categories, many=True)
         return Response({"categories": serializer.data})

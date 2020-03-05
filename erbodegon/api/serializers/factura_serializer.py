@@ -5,7 +5,7 @@ from ..models import Factura
 # PRODUCT SERIALIZER
 class FacturaSerializer(serializers.Serializer):
     id = serializers.ReadOnlyField()
-    total = serializers.IntegerField()
+    total = serializers.FloatField()
     codigo = serializers.IntegerField()
     delivery_id = serializers.IntegerField()
     created_at = serializers.ReadOnlyField()

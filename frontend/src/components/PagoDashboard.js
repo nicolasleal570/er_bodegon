@@ -2,13 +2,13 @@ import React, { Component } from 'react'
 import Axios from 'axios';
 import { Link } from 'react-router-dom'
 
-export class ProductDashboard extends Component {
+export class PagoDashboard extends Component {
 
     constructor(props) {
         super(props);
 
         this.state = {
-            products: []
+            pagos: []
         };
 
         this.deleteProduct = this.deleteProduct.bind(this);
@@ -19,10 +19,10 @@ export class ProductDashboard extends Component {
     }
 
     getProductsFromAPI() {
-        Axios.get('http://localhost:8000/api/productos/').then(res => {
+        Axios.get('http://localhost:8000/api/pagos/').then(res => {
             this.setState({
                 ...this.state,
-                products: res.data.products
+                pagos: res.data.pagos
             });
 
             console.log(this.state);
@@ -35,7 +35,7 @@ export class ProductDashboard extends Component {
             'is_available': false
         }
 
-        Axios.put(`http://localhost:8000/api/productos/${product.id}`, { 'product': newProduct }).then(res => {
+        Axios.put(`http://localhost:8000/api/pagos/${product.id}`, { 'product': newProduct }).then(res => {
             this.getProductsFromAPI();            
         }).catch(err => console.log(err));
     }
@@ -45,35 +45,27 @@ export class ProductDashboard extends Component {
             <div className="container my-4">
                 <div className="row">
                     <div className="col-md-12">
-                        <h3>Todos los Producto</h3>
+                        <h3>Todos los Pagos</h3>
                         <hr />
-                        <Link to="/new/producto" className="btn btn-primary mb-4">Crear Producto</Link>
+                        {/* <Link to="/new/producto" className="btn btn-primary mb-4">Crear Producto</Link> */}
                         <div className="card">
                             <div className="card-body">
                                 <table className="table">
                                     <thead>
                                         <tr>
                                             <th scope="col">#</th>
-                                            <th scope="col">Nombre</th>
-                                            <th scope="col">Codigo</th>
-                                            <th scope="col">Precio real</th>
-                                            <th scope="col">Descuento</th>
-                                            <th scope="col">Precio con Descuento</th>
+                                            <th scope="col">Monto</th>
                                             <th scope="col">Acciones</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {this.state.products.map(product => {
-                                            return product.is_available ? <tr key={product.id}>
-                                                <th scope="row">{product.id}</th>
-                                                <td>{product.name}</td>
-                                                <td>{product.codigo}</td>
-                                                <td>{product.costo} $</td>
-                                                <td>{product.descuento}%</td>
-                                                <td>{product.descuento !== 0 ? (product.costo * (product.descuento / 100)).toFixed(2) : product.costo} $</td>
+                                        {this.state.pagos.map(pago => {
+                                            return pago.is_available ? <tr key={pago.id}>
+                                                <th scope="row">{pago.id}</th>
+                                                <td>{pago.mount} $</td>
                                                 <td>
-                                                    <button onClick={() => this.deleteProduct(product)} className="btn btn-sm btn-danger mr-3">Eliminar</button>
-                                                    {/* <Link to={`/update/producto/${product.id}`} className="btn btn-sm btn-warning">Editar</Link> */}
+                                                    <button onClick={() => this.deleteProduct(pago)} className="btn btn-sm btn-danger mr-3">Eliminar</button>
+                                                    {/* <Link to={`/update/pago/${pago.id}`} className="btn btn-sm btn-warning">Editar</Link> */}
                                                 </td>
                                             </tr> : ''
                                         })}
@@ -88,4 +80,4 @@ export class ProductDashboard extends Component {
     }
 }
 
-export default ProductDashboard
+export default PagoDashboard

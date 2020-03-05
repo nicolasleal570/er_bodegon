@@ -4,6 +4,7 @@ import { Redirect } from "react-router-dom";
 import SelectInputField from './partials/SelectInputField';
 
 import TextInputField from './partials/TextInputField';
+import ErrorHandlerAler from './partials/ErrorHandlerAler';
 
 export class ProductForm extends Component {
 
@@ -13,28 +14,38 @@ export class ProductForm extends Component {
         this.state = {
             formControls: {
                 name: {
-                    placeholder: 'Insert the name',
+                    placeholder: 'Inserta el nombre',
                     type: 'text',
                     value: ''
                 },
                 codigo: {
-                    placeholder: 'Insert the codigo',
+                    placeholder: 'Inserta el codigo',
                     type: 'number',
                     value: ''
                 },
                 costo: {
-                    placeholder: 'Insert the costo',
+                    placeholder: 'Inserta el costo',
                     type: 'number',
                     value: ''
                 },
                 descuento: {
-                    placeholder: 'Insert the descuento',
+                    placeholder: 'Inserta el descuento',
                     type: 'number',
                     value: ''
                 },
                 category_id: {
                     placeholder: 'Selecciona una categoría',
                     options: [],
+                    value: ''
+                },
+                inventario: {
+                    placeholder: 'Inserta la cantidad que hay en inventario',
+                    type: 'number',
+                    value: ''
+                },
+                vencimiento: {
+                    placeholder: 'Inserta fecha vencimiento (YYYY-MM-DD)',
+                    type: 'date',
                     value: ''
                 },
             },
@@ -123,7 +134,7 @@ export class ProductForm extends Component {
         const name = event.target.name; // Input name
         let value = event.target.value; // Input value
 
-        if (name === "category_id") {
+        if (name === "category_id" || name === "inventario") {
             value = Number(value);
         }
 
@@ -153,21 +164,29 @@ export class ProductForm extends Component {
             'category_id': Number(form.category_id.value),
             'is_available': true
         }
-
-        console.log(product);
+        
+        let stock = {
+            cantidad: Number(form.inventario.value),
+            product_id: null,
+            is_available: true
+        };
 
         if (this.state.productId !== null) {
             this.updateProduct(product)
         } else {
-            this.createNewProduct(product)
+            this.createNewProduct(product, stock)
         }
 
     }
 
-    createNewProduct(product) {
+    createNewProduct(product, stock) {
         // Send the data to the api and create a new product
         axios.post('http://localhost:8000/api/productos/', { product }).then(res => {
-            this.setState({ redirect: "/products" });
+            stock.product_id = res.data.product.id;
+            axios.post('http://localhost:8000/api/inventario/', { 'stock': stock }).then(respon => {
+                console.log(res.data, respon.data);
+                this.setState({ redirect: "/productos" });
+            });
         }).catch(err => {
             const errors = {
                 exist: true,
@@ -176,16 +195,16 @@ export class ProductForm extends Component {
             this.setState({
                 ...this.state,
                 handleErrors: errors
-            })
+            });
 
-            console.log(this.state);
+            console.log(this.state.handleErrors);
         });
     }
 
     updateProduct(product) {
         // Send the data to the api and create a new product
         axios.put(`http://localhost:8000/api/productos/${this.state.productId}`, { product }).then(res => {
-            this.setState({ redirect: "/products" });
+            this.setState({ redirect: "/productos" });
         }).catch(err => {
             const errors = {
                 exist: true,
@@ -230,6 +249,14 @@ export class ProductForm extends Component {
                                     placeholder={this.state.formControls.descuento.placeholder}
                                     value={this.state.formControls.descuento.value}
                                     onChange={this.handleChange} />
+                                <TextInputField name="inventario"
+                                    placeholder={this.state.formControls.inventario.placeholder}
+                                    value={this.state.formControls.inventario.value}
+                                    onChange={this.handleChange} />
+                                <TextInputField name="vencimiento"
+                                    placeholder={this.state.formControls.vencimiento.placeholder}
+                                    value={this.state.formControls.vencimiento.value}
+                                    onChange={this.handleChange} />
 
                                 <div className="form-group">
                                     <SelectInputField name="category_id"
@@ -241,7 +268,7 @@ export class ProductForm extends Component {
                                 </div>
 
                                 {
-                                    this.state.handleErrors.exist ? <h1>Hay errores</h1> : ''
+                                    this.state.handleErrors.exist ? <ErrorHandlerAler errors={this.state.handleErrors.errors} keys={['name','codigo','costo','descuento', 'category_id']} /> : ''
                                 }
                                 <input type="submit" value="Guardar Producto" className="btn btn-primary" />
                             </form>

@@ -13,6 +13,8 @@ from .viewsets.instrumento_view import InstrumentoView
 from .viewsets.delivery_view import DeliveryView
 from .viewsets.empleado_view import EmpleadoView
 from .viewsets.category_view import CategoryView
+from .viewsets.client_detail_view import ClientDetail
+from .viewsets.usuario_detail_view import UsuarioDetail
 
 urlpatterns = [
     path('productos/', ProductView.as_view()),
@@ -24,10 +26,12 @@ urlpatterns = [
     path('facturas/detalle/<int:pk>', FacturaDetailView.as_view()),
     path('usuarios/', UsuarioView.as_view()),
     path('usuarios/<int:pk>', UsuarioView.as_view()),
+    path('usuarios/get/<int:pk>', UsuarioDetail.as_view()),
     path('categorias/', CategoryView.as_view()),
     path('categorias/<int:pk>', CategoryView.as_view()),
     path('clientes/', ClienteView.as_view()),
     path('clientes/<int:pk>', ClienteView.as_view()),
+    path('clientes/get/<int:pk>', ClientDetail.as_view()), # Selecciona un solo producto
     path('pagos/', PagoView.as_view()),
     path('pagos/<int:pk>', PagoView.as_view()),
     path('divisas/', DivisaView.as_view()),
@@ -36,8 +40,8 @@ urlpatterns = [
     path('inventario/<int:pk>', StockView.as_view()),
     path('instrumentos/', InstrumentoView.as_view()),
     path('instrumentos/<int:pk>', InstrumentoView.as_view()),
-    path('delivery/', DeliveryView.as_view()),
-    path('delivery/<int:pk>', DeliveryView.as_view()),
+    path('entregas/', DeliveryView.as_view()),
+    path('entregas/<int:pk>', DeliveryView.as_view()),
     path('empleados/', EmpleadoView.as_view()),
     path('empleados/<int:pk>', EmpleadoView.as_view()),
 ]

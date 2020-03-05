@@ -84,7 +84,7 @@ export class ClientDashboard extends Component {
                                                 <td>{cliente.ubication}</td>
                                                 <td>
                                                     <button onClick={() => this.deleteClient(cliente)} className="btn btn-sm btn-danger mr-3">Eliminar</button>
-                                                    <Link to={`/update/cliente/${cliente.id}`} className="btn btn-sm btn-warning">Editar</Link>
+                                                    {/* <Link to={`/update/cliente/${cliente.id}`} className="btn btn-sm btn-warning">Editar</Link> */}
                                                 </td>
                                             </tr> : ''
                                         })}
