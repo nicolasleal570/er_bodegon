@@ -2,38 +2,38 @@ import React, { Component } from 'react'
 import Axios from 'axios';
 import { Link } from 'react-router-dom'
 
-export class DivisaDashboard extends Component {
+export class CategoryDashboard extends Component {
 
     constructor(props) {
         super(props);
 
         this.state = {
-            divisas: [],
+            categorias: [],
         };
 
     }
 
     componentDidMount() {
-        this.getDivisasFromAPI();
+        this.getInstrumentosFromAPI();
     }
 
-    getDivisasFromAPI() {
-        Axios.get('http://localhost:8000/api/divisas/').then(res => {
+    getInstrumentosFromAPI() {
+        Axios.get('http://localhost:8000/api/categorias/').then(res => {
             this.setState({
                 ...this.state,
-                divisas: res.data.divisas
+                categorias: res.data.categories
             });
         }).catch(err => console.log(err));
     }
 
-    deleteDivisa(product) {
-        const newDivisa = {
+    deleteInstrumento(product) {
+        const newInstrumento = {
             ...product,
             'is_available': false
         }
 
-        Axios.put(`http://localhost:8000/api/divisas/${product.id}`, { 'divisa': newDivisa }).then(res => {
-            this.getDivisasFromAPI();
+        Axios.put(`http://localhost:8000/api/categorias/${product.id}`, { 'category': newInstrumento }).then(res => {
+            this.getInstrumentosFromAPI();
         }).catch(err => console.log(err));
     }
 
@@ -42,29 +42,26 @@ export class DivisaDashboard extends Component {
             <div className="container my-4">
                 <div className="row">
                     <div className="col-md-12">
-                        <h3>Todas las Divisas</h3>
+                        <h3>Todas las Categorias</h3>
                         <hr />
-                        <Link to="/new/divisa" className="btn btn-primary mb-4">Crear Divisa</Link>
+                        <Link to="/new/categoria" className="btn btn-primary mb-4">Crear Categoria</Link>
                         <div className="card">
                             <div className="card-body">
                                 <table className="table">
                                     <thead>
                                         <tr>
                                             <th scope="col">#</th>
-                                            <th scope="col">Tipo</th>
-                                            <th scope="col">Tasa</th>
+                                            <th scope="col">Nombre</th>
                                             <th scope="col">Acciones</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {this.state.divisas.map(divisa => {
-                                            return divisa.is_available ? <tr key={divisa.id}>
-                                                <th scope="row">{divisa.id}</th>
-                                                <td>{divisa.tipo}</td>
-                                                <td>{divisa.tasa}</td>
+                                        {this.state.categorias.map(categoria => {
+                                            return categoria.is_available ? <tr key={categoria.id}>
+                                                <th scope="row">{categoria.id}</th>
+                                                <td>{categoria.name}</td>
                                                 <td>
-                                                    <button onClick={() => this.deleteDivisa(divisa)} className="btn btn-sm btn-danger mr-3">Eliminar</button>
-                                                    {/* <Link to={`/update/delivery/${delivery.id}`} className="btn btn-sm btn-warning">Editar</Link> */}
+                                                    <button type="button" onClick={() => this.deleteInstrumento(categoria)} className="btn btn-sm btn-danger mr-3">Eliminar</button>
                                                 </td>
                                             </tr> : ''
                                         })}
@@ -79,4 +76,4 @@ export class DivisaDashboard extends Component {
     }
 }
 
-export default DivisaDashboard
+export default CategoryDashboard

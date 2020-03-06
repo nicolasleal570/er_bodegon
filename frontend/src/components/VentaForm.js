@@ -398,7 +398,7 @@ export class VentaForm extends Component {
                                         options={this.state.formControls.cliente.options} />
                                 </div>
                                 <div className="card-footer">
-                                    <Link className="btn btn-primary" to="/new/usuario">Crear Usuario Nuevo</Link>
+                                    <Link className="btn btn-primary" to="/new/cliente">Crear Nuevo Cliente</Link>
                                 </div>
                             </div>
                         </div>
@@ -427,7 +427,7 @@ export class VentaForm extends Component {
 
                                 </div>
                                 <div className="card-footer">
-                                    <Link className="btn btn-primary" to="/new/usuario">Crear Delivery</Link>
+                                    <Link className="btn btn-primary" to="/new/delivery">Crear Delivery</Link>
                                 </div>
                             </div>
                         </div>
