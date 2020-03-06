@@ -64,7 +64,7 @@ export class VentaDashboard extends Component {
                                             return factura.is_available ? <tr key={factura.id}>
                                                 <th scope="row">{factura.id}</th>
                                                 <td>{factura.codigo}</td>
-                                                <td>{factura.total} $</td>
+                                                <td>{factura.total.toFixed(2)} $</td>
                                                 <td>
                                                     <button onClick={() => this.deleteProduct(factura)} className="btn btn-sm btn-danger mr-3">Eliminar</button>
                                                     {/* <Link to={`/update/facturao/${factura.id}`} className="btn btn-sm btn-warning">Editar</Link> */}

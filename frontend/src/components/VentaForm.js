@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import axios from 'axios'
 import SelectInputField from './partials/SelectInputField';
-import { Link } from 'react-router-dom';
+import { Link, Redirect } from 'react-router-dom';
 import DynamicProductsField from './DynamicProductsField';
 import DynamicPagosField from './DynamicPagosField';
 import TextInputField from './partials/TextInputField';
@@ -36,14 +36,27 @@ export class VentaForm extends Component {
                     options: [],
                     value: ''
                 },
-                delivery: {
-                    value: '',
-                    placeholder: 'Selecciona el delivery.',
-                    options: [
-                        { value: 'delivery 0', displayValue: 'CCS' },
-                    ]
+                delivery_direccion: {
+                    placeholder: 'Direccion de entrega',
+                    type: 'text',
+                    value: ''
                 },
-                total: 0,
+                delivery_descuento: {
+                    placeholder: 'Descuento por entrega',
+                    type: 'number',
+                    value: ''
+                },
+                delivery_tiempo: {
+                    placeholder: 'Tiempo de entrega estimado (Formato: HH:MM:ss)',
+                    type: 'time',
+                    value: ''
+                },
+                delivery_usuario: {
+                    placeholder: 'Selecciona el cliente que hará la entrega',
+                    options: [],
+                    value: ''
+                },
+                total: null,
             },
             handleErrors: {
                 exist: false,
@@ -52,10 +65,12 @@ export class VentaForm extends Component {
                     description: [],
                 }
             },
+            redirect: null,
             selectProductsOptions: [],
             selectPagosOptions: [],
             facturaId: null,
             clientesLoading: true,
+            usuariosLoading: true,
             productosLoading: true,
             pagosLoading: true,
             deliveryLoading: true,
@@ -72,6 +87,7 @@ export class VentaForm extends Component {
                 const clientes = res.data.clientes;
                 const usuarios = respon.data.usuarios;
                 const options = [];
+                const optionsUser = [];
 
                 clientes.forEach(item => {
                     const usuario = usuarios.find(user => user.id === item.usuario_id);
@@ -83,6 +99,15 @@ export class VentaForm extends Component {
                     options.push(option);
                 });
 
+                usuarios.forEach(item => {
+                    const option = {
+                        value: item.id,
+                        displayValue: item.name
+                    }
+
+                    optionsUser.push(option);
+                });
+
                 this.setState({
                     ...this.state,
                     formControls: {
@@ -90,14 +115,22 @@ export class VentaForm extends Component {
                         cliente: {
                             ...this.state.formControls['clientes'],
                             options
+                        },
+                        delivery_usuario: {
+                            ...this.state.formControls['delivery_usuario'],
+                            options: optionsUser
                         }
                     }
-                }, () => this.setState(
-                    {
-                        ...this.state,
-                        'clientesLoading': false
-                    }
-                ));
+                }, () => {
+                    this.setState(
+                        {
+                            ...this.state,
+                            'clientesLoading': false,
+                            'usuariosLoading': false
+                        }
+                    )
+                    console.log(this.state.formControls);
+                });
             });
         });
 
@@ -105,12 +138,14 @@ export class VentaForm extends Component {
 
             let options = [];
             res.data.products.forEach(item => {
-                const opt = {
-                    value: item.id,
-                    label: item.name,
-                    ...item
+                if (item.is_available) {
+                    const opt = {
+                        value: item.id,
+                        label: item.name,
+                        ...item
+                    }
+                    options.push(opt);
                 }
-                options.push(opt);
             });
 
             this.setState({
@@ -135,36 +170,6 @@ export class VentaForm extends Component {
                 ...this.state,
                 selectPagosOptions: options
             }, () => this.setState({ ...this.state, pagosLoading: false }));
-        });
-
-        axios.get('http://localhost:8000/api/entregas/').then(res => {
-
-            let options = [];
-
-            res.data.deliveries.forEach((item, index) => {
-                let opt = {
-                    value: Number(item.id),
-                    displayValue: `${index + 1}.- Direccion: ${item.direction}`
-                }
-                options.push(opt);
-            });
-
-            this.setState({
-                ...this.state,
-                formControls: {
-                    ...this.state.formControls,
-                    delivery: {
-                        ...this.state.formControls.delivery,
-                        options: options
-                    }
-                }
-            }, () => {
-                console.log(this.state.formControls);
-                this.setState({
-                    ...this.state,
-                    deliveryLoading: false
-                });
-            })
         });
 
         this.getPagosSchema();
@@ -215,7 +220,7 @@ export class VentaForm extends Component {
         let name = event.target.name; // Input name
         let value = event.target.value; // Input value
 
-        if (name === "cliente" || name === "pago" || name === "codigo") {
+        if (name === "cliente" || name === "pago" || name === "codigo" || name === "delivery_usuario") {
             value = Number(value);
         }
 
@@ -228,95 +233,106 @@ export class VentaForm extends Component {
                     value
                 }
             }
-        });
+        }, () => console.log(this.state.formControls));
     }
 
     handleSubmit(event) {
+        event.preventDefault();
         const name = event.target.name;
         let value = event.target.value;
-        event.preventDefault();
 
         console.log(this.state.formControls);
 
-        const codigo = this.state.formControls.codigo.value;
-        const clientId = this.state.formControls.cliente.value;
-        const productos = this.state.formControls.productos;
-        const pagos = this.state.formControls.pago;
-        const deliveryId = Number(this.state.formControls.delivery.value);
-        const total = this.state.formControls.total;
-
-        const factura = {
-            total,
-            codigo,
-            'delivery_id': deliveryId,
-            'cliente_id': clientId,
-            'is_available': true
+        const delivery = {
+            direction: this.state.formControls.delivery_direccion.value,
+            discount: this.state.formControls.delivery_descuento.value,
+            delivery_time: this.state.formControls.delivery_tiempo.value,
+            entregado_por_id: this.state.formControls.delivery_usuario.value,
+            is_available: true
         }
 
-        axios.post('http://localhost:8000/api/facturas/', { factura }).then(res => {
-            const facturaId = res.data.factura.id;
+        axios.post('http://localhost:8000/api/entregas/', { delivery }).then(respu => {
 
-            pagos.forEach(pago => {
-                let newPago = {
-                    divisa_id: pago.divisaId,
-                    instrumento_id: pago.instrumentoId,
-                    mount: pago.mount,
-                    factura_id: facturaId,
-                    is_available: true
-                }
-                axios.post('http://localhost:8000/api/pagos/', { 'pago': newPago }).then(respon => {
-                    console.log(respon.data);
-                });
-            });
+            const codigo = this.state.formControls.codigo.value;
+            const clientId = this.state.formControls.cliente.value;
+            const productos = this.state.formControls.productos;
+            const pagos = this.state.formControls.pago;
+            const deliveryId = respu.data.delivery.id;
+            const total = this.state.formControls.total;
 
-            productos.forEach(producto => {
-                let price = 0;
-                this.state.selectProductsOptions.forEach(prod => {
-                    if (prod.id === producto.productId) {
-                        price = prod.costo;
-                        return;
+            const factura = {
+                total,
+                codigo,
+                'delivery_id': deliveryId,
+                'cliente_id': clientId,
+                'is_available': true
+            }
+
+            axios.post('http://localhost:8000/api/facturas/', { factura }).then(res => {
+                const facturaId = res.data.factura.id;
+
+                pagos.forEach(pago => {
+                    let newPago = {
+                        divisa_id: pago.divisaId,
+                        instrumento_id: pago.instrumentoId,
+                        mount: pago.mount,
+                        factura_id: facturaId,
+                        is_available: true
                     }
-                });
-
-                const newFactDetail = {
-                    price_per_unit: price,
-                    iva: 1.25,
-                    quantity: producto.cantidad,
-                    factura_id: facturaId,
-                    product_id: producto.productId,
-                    is_available: true
-                }
-
-                axios.post('http://localhost:8000/api/facturas/detalle/', { 'factura_detail': newFactDetail }).then(res => {
-                    console.log(res.data);
-                }).catch(err => {
-                    const errors = {
-                        exist: true,
-                        errors: err.response.data
-                    };
-                    this.setState({
-                        ...this.state,
-                        handleErrors: errors
+                    axios.post('http://localhost:8000/api/pagos/', { 'pago': newPago }).then(respon => {
+                        console.log(respon.data);
                     });
-        
-                    console.log(this.state.handleErrors);
                 });
+
+                productos.forEach(producto => {
+                    let price = 0;
+                    this.state.selectProductsOptions.forEach(prod => {
+                        if (prod.id === producto.productId) {
+                            price = prod.costo;
+                            return;
+                        }
+                    });
+
+                    const newFactDetail = {
+                        price_per_unit: price,
+                        iva: 1.25,
+                        quantity: producto.cantidad,
+                        factura_id: facturaId,
+                        product_id: producto.productId,
+                        is_available: true
+                    }
+
+                    axios.post('http://localhost:8000/api/facturas/detalle/', { 'factura_detail': newFactDetail }).then(res => {
+                        console.log(res.data);
+                        this.setState({ redirect: "/ventas" });
+                    }).catch(err => {
+                        const errors = {
+                            exist: true,
+                            errors: err.response.data
+                        };
+                        this.setState({
+                            ...this.state,
+                            handleErrors: errors
+                        });
+
+                        console.log(this.state.handleErrors);
+                    });
+                });
+
+
+            }).catch(error => {
+                const errors = {
+                    exist: true,
+                    errors: error.response.data
+                };
+                this.setState({
+                    ...this.state,
+                    handleErrors: errors
+                });
+
+                console.log(this.state.handleErrors);
             });
-
-
-        }).catch(err => {
-            const errors = {
-                exist: true,
-                errors: err.response.data
-            };
-            this.setState({
-                ...this.state,
-                handleErrors: errors
-            });
-
-            console.log(this.state.handleErrors);
-        });
-
+        }).catch(err => console.log(err));
 
     }
 
@@ -346,7 +362,7 @@ export class VentaForm extends Component {
                     ...this.state.formControls,
                     total
                 }
-            });
+            }, () => console.log(this.state.formControls));
 
 
         });
@@ -364,6 +380,9 @@ export class VentaForm extends Component {
     }
 
     render() {
+        if (this.state.redirect) {
+            return <Redirect to={this.state.redirect} />
+        }
         return (
             <div className="container mt-4">
                 <form onSubmit={this.handleSubmit}>
@@ -418,16 +437,25 @@ export class VentaForm extends Component {
                                     <small>Selecciona el delivery a ser realizado. (En caso de que haha sido solicitado)</small>
                                 </div>
                                 <div className="card-body">
-                                    <SelectInputField name="delivery"
-                                        value={this.state.formControls.delivery.value}
+                                    <TextInputField name="delivery_direccion"
+                                        placeholder={this.state.formControls.delivery_direccion.placeholder}
+                                        value={this.state.formControls.delivery_direccion.value}
+                                        onChange={this.handleChange} />
+                                    <TextInputField name="delivery_descuento"
+                                        placeholder={this.state.formControls.delivery_descuento.placeholder}
+                                        value={this.state.formControls.delivery_descuento.value}
+                                        onChange={this.handleChange} />
+                                    <TextInputField name="delivery_tiempo"
+                                        placeholder={this.state.formControls.delivery_tiempo.placeholder}
+                                        value={this.state.formControls.delivery_tiempo.value}
+                                        onChange={this.handleChange} />
+                                    <SelectInputField name="delivery_usuario"
+                                        value={this.state.formControls.delivery_usuario.value}
                                         onChange={this.handleChange}
-                                        placeholder={this.state.formControls.delivery.placeholder}
-                                        loading={this.state.deliveryLoading}
-                                        options={this.state.formControls.delivery.options} />
+                                        placeholder={this.state.formControls.delivery_usuario.placeholder}
+                                        loading={this.state.usuariosLoading}
+                                        options={this.state.formControls.delivery_usuario.options} />
 
-                                </div>
-                                <div className="card-footer">
-                                    <Link className="btn btn-primary" to="/new/delivery">Crear Delivery</Link>
                                 </div>
                             </div>
                         </div>
@@ -436,13 +464,16 @@ export class VentaForm extends Component {
                     <div className="row my-4">
                         {/* PAGOS DEL USUARIO */}
                         <div className="col-md-12">
-                            <DynamicPagosField
-                                mount={this.state.formControls.total}
-                                options={this.state.selectPagosOptions}
-                                divisas={this.state.formControls.divisa_id}
-                                facturaId={this.state.facturaId}
-                                instrumentos={this.state.formControls.instrumento_id}
-                                setSelectedPagos={(inputFields) => this.setSelectedPagos(inputFields)} />
+                            {
+                                this.state.formControls.total === null || this.state.formControls.total === 0 ? ''
+                                    : <DynamicPagosField
+                                        mount={this.state.formControls.total}
+                                        options={this.state.selectPagosOptions}
+                                        divisas={this.state.formControls.divisa_id}
+                                        facturaId={this.state.facturaId}
+                                        instrumentos={this.state.formControls.instrumento_id}
+                                        setSelectedPagos={(inputFields) => this.setSelectedPagos(inputFields)} />
+                            }
                         </div>
                     </div>
                     <div className="row-mt-4">

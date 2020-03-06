@@ -26,7 +26,6 @@ function App() {
       <Navbar />
 
       <Switch>
-        <Route path="/dashboard" component={Dashboard} />
         <Route path="/productos" component={ProductDashboard} />
         <Route path="/clientes" component={ClientDashboard} />
         <Route path="/delivery" component={DeliveryDashboard} />
@@ -36,7 +35,7 @@ function App() {
         <Route path="/instrumentos" component={InstrumentoDashboard} />
         <Route path="/categorias" component={CategoryDashboard} />
         <Route path="/empleados" component={EmpleadoDashboard} />
-        {/* <Route path="" component={DynamicField} /> */}
+
         <Route path="/new/producto" component={ProductForm} />
         <Route path="/update/producto/:productId" component={ProductForm} />
         <Route path="/new/cliente" component={ClientForm} />
@@ -48,6 +47,8 @@ function App() {
         <Route path="/new/categoria" component={CategoryForm} />
         <Route path="/new/empleado" component={EmpleadoForm} />
         <Route path="/new/venta" component={VentaForm} />
+        
+        <Route path="/" component={Dashboard} />
       </Switch>
     </Router>
   );
